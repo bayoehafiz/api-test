@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\KostResource;
 use App\Kost;
+use App\User;
 use Illuminate\Http\Request;
 
 class KostController extends Controller
@@ -11,6 +12,18 @@ class KostController extends Controller
     public function index()
     {
         return KostResource::collection(Kost::with('rooms')->paginate(10));
+    }
+
+    public function listByUser($id, User $user, Kost $kost)
+    {
+        // check if user record exists
+        if ($user->where('id', $id)->exists()) {
+            return KostResource::collection(Kost::where('user_id', $id)->with('rooms')->paginate(10));
+        }
+
+        return response()->json([
+            'message' => 'No user found!',
+        ], 400);
     }
 
     public function store(Request $request)
@@ -28,7 +41,14 @@ class KostController extends Controller
 
     public function show(Request $request, Kost $kost)
     {
-        return $kost->where('id', $request->id)->first();
+        // check if such record exists
+        if ($kost->where('id', $request->id)->exists()) {
+            return $kost->where('id', $request->id)->with('rooms')->first();
+        }
+
+        return response()->json([
+            'message' => 'No kost found!',
+        ], 400);
     }
 
     public function update(Request $request, Kost $kost)
@@ -39,10 +59,10 @@ class KostController extends Controller
             return response()->json(['error' => 'You can only edit your own kosts.'], 403);
         }
 
-        $kost = $kost->where('id', $request->id)->update($request->only(['name', 'address', 'city', 'phone']));
+        $kost->where('id', $request->id)->update($request->only(['name', 'address', 'city', 'phone']));
 
         return response()->json([
-            'message' => 'Kost successfully updated'
+            'message' => 'Kost successfully updated',
         ], 202);
     }
 
@@ -51,13 +71,13 @@ class KostController extends Controller
         // check if currently authenticated user is the owner of the kost
         $user = auth()->user();
         if ($user->id !== $kost->where('id', $request->id)->value('user_id')) {
-            return response()->json(['error' => 'You can only edit your own kosts.'], 403);
+            return response()->json(['error' => 'You can only delete your own kosts.'], 403);
         }
 
         $kost->where('id', $request->id)->delete();
 
         return response()->json([
-            'message' => 'Kost successfully deleted!'
+            'message' => 'Kost successfully deleted!',
         ], 204);
     }
 }

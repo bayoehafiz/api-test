@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Credits extends Model
+class Credit extends Model
 {
     protected $fillable = ['user_id', 'amount', 'reset_time'];
 
@@ -13,7 +13,7 @@ class Credits extends Model
       return $this->belongsTo(User::class);
     }
 
-    public function creditUsage()
+    public function credit_usage()
     {
       return $this->hasMany(CreditUsage::class);
     }
