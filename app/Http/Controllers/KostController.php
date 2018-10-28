@@ -41,8 +41,9 @@ class KostController extends Controller
 
         $kost = $kost->where('id', $request->id)->update($request->only(['name', 'address', 'city', 'phone']));
 
-        // return new KostResource($kost);
-        return response()->json(null, 202);
+        return response()->json([
+            'message' => 'Kost successfully updated'
+        ], 202);
     }
 
     public function destroy(Request $request, Kost $kost)
@@ -55,6 +56,8 @@ class KostController extends Controller
 
         $kost->where('id', $request->id)->delete();
 
-        return response()->json(null, 204);
+        return response()->json([
+            'message' => 'Kost successfully deleted!'
+        ], 204);
     }
 }

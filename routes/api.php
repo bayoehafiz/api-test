@@ -36,5 +36,3 @@ Route::group([
     // Route::apiResource('rooms', 'RoomController');
 });
 
-// Route::apiResource('kosts', 'KostController');
-// Route::apiResource('kosts/{kost}/rooms', 'RoomController@store');
